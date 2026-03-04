@@ -1,8 +1,208 @@
+import { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import {
+  useReactTable,
+  getCoreRowModel,
+  getSortedRowModel,
+  getPaginationRowModel,
+  getFilteredRowModel,
+  flexRender,
+} from '@tanstack/react-table';
+import { getAllUsers, deleteUser } from '../services/userService';
+import ConfirmModal from '../components/ConfirmModal';
+
 function UsersListPage() {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [pendingDeleteId, setPendingDeleteId] = useState(null);
+  const [sorting, setSorting] = useState([]);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+  const [globalFilter, setGlobalFilter] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const fetchUsers = async () => {
+      try {
+        const response = await getAllUsers({ signal: controller.signal });
+        setUsers(response.data);
+      } catch (err) {
+        if (err.name !== 'CanceledError') console.error(err);
+        setUsers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchUsers();
+    return () => controller.abort();
+  }, []);
+
+  const handleConfirmDelete = async () => {
+    try {
+      await deleteUser(pendingDeleteId);
+      setUsers((prev) => prev.filter((u) => u.id !== pendingDeleteId));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setPendingDeleteId(null);
+    }
+  };
+
+  const columns = useMemo(() => [
+    {
+      accessorKey: 'name',
+      header: 'Name',
+    },
+    {
+      accessorKey: 'surname',
+      header: 'Surname',
+    },
+    {
+      id: 'actions',
+      header: 'Actions',
+      enableSorting: false,
+      cell: ({ row }) => (
+        <button
+          className="btn btn-danger btn-sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            setPendingDeleteId(row.original.id);
+          }}
+        >
+          Delete
+        </button>
+      ),
+    },
+  ], []);
+
+  const table = useReactTable({
+    data: users,
+    columns,
+    state: { sorting, pagination, globalFilter },
+    onSortingChange: setSorting,
+    onPaginationChange: setPagination,
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+  });
+
   return (
-    <div >
-        <h1 className="text-2xl font-bold mb-4">Users List Page</h1>
+    <div className="max-w-4xl mx-auto">
+      {pendingDeleteId && (
+        <ConfirmModal
+          message="Are you sure you want to delete this user?"
+          onConfirm={handleConfirmDelete}
+          onCancel={() => setPendingDeleteId(null)}
+        />
+      )}
+
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-1">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate(-1)}
+              className="py-1.5 px-3 rounded-md border-0 cursor-pointer text-sm font-medium bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] transition-colors"
+            >
+              ← Back
+            </button>
+            <h2 className="text-2xl font-bold text-[#cdd6f4] m-0">Users</h2>
+          </div>
+          <button
+            className="py-2 px-5 rounded-md border-0 cursor-pointer text-sm font-semibold bg-[#89b4fa] text-[#1e1e2e] hover:bg-[#b4d0fb] transition-colors"
+            onClick={() => navigate('/register')}
+          >
+            + Register New User
+          </button>
+        </div>
+        {!loading && <p className="text-[#6c7086] text-sm ml-1 mb-0">{users.length} registered user{users.length !== 1 ? 's' : ''}</p>}
+      </div>
+
+      <div className="bg-[#1e1e2e] rounded-xl border border-[#313244] overflow-hidden">
+        <div className="px-4 pt-4 pb-3 border-b border-[#313244]">
+          <input
+            type="text"
+            placeholder="🔍  Search by name or surname..."
+            value={globalFilter}
+            onChange={(e) => {
+              setGlobalFilter(e.target.value);
+              table.setPageIndex(0);
+            }}
+            className="w-full py-2 px-3 bg-[#313244] text-[#cdd6f4] border border-[#45475a] rounded-lg text-sm focus:outline-none focus:border-[#89b4fa] placeholder-[#585b70]"
+          />
+        </div>
+
+        {loading && <p className="text-[#6c7086] p-6">Loading...</p>}
+
+        {!loading && users.length === 0 && (
+          <p className="text-[#6c7086] italic p-6">No users found.</p>
+        )}
+
+        {!loading && users.length > 0 && (
+          <table className="w-full border-collapse">
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th
+                      key={header.id}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className="py-3 px-4 text-left bg-[#181825] text-[#89b4fa] text-xs uppercase tracking-wider font-semibold select-none"
+                      style={{ cursor: header.column.getCanSort() ? 'pointer' : 'default' }}
+                    >
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.column.getIsSorted() === 'asc' ? ' ↑' : header.column.getIsSorted() === 'desc' ? ' ↓' : ''}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            <tbody>
+              {table.getRowModel().rows.map((row, i) => (
+                <tr
+                  key={row.id}
+                  onClick={() => window.open(`/users/${row.original.id}`, '_blank')}
+                  className={`cursor-pointer transition-colors hover:bg-[#2a2a3c] ${i % 2 === 0 ? 'bg-[#1e1e2e]' : 'bg-[#24243a]'}`}
+                  title="Click to view details"
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <td key={cell.id} className="py-3 px-4 text-left border-b border-[#313244] text-[#cdd6f4] text-sm">
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+
+        {!loading && users.length > 0 && (
+          <div className="flex items-center justify-between px-4 py-3 border-t border-[#313244]">
+            <span className="text-[#6c7086] text-xs">
+              Showing {table.getState().pagination.pageIndex * table.getState().pagination.pageSize + 1}–{Math.min((table.getState().pagination.pageIndex + 1) * table.getState().pagination.pageSize, table.getFilteredRowModel().rows.length)} of {table.getFilteredRowModel().rows.length}
+            </span>
+            <div className="flex items-center gap-2">
+              <button className="py-1 px-2 text-sm rounded border-0 cursor-pointer bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] disabled:opacity-40 disabled:cursor-not-allowed" onClick={() => table.firstPage()} disabled={!table.getCanPreviousPage()}>«</button>
+              <button className="py-1 px-2 text-sm rounded border-0 cursor-pointer bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] disabled:opacity-40 disabled:cursor-not-allowed" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>‹</button>
+              <span className="text-[#cdd6f4] text-xs px-1">Page {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}</span>
+              <button className="py-1 px-2 text-sm rounded border-0 cursor-pointer bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] disabled:opacity-40 disabled:cursor-not-allowed" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>›</button>
+              <button className="py-1 px-2 text-sm rounded border-0 cursor-pointer bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] disabled:opacity-40 disabled:cursor-not-allowed" onClick={() => table.lastPage()} disabled={!table.getCanNextPage()}>»</button>
+              <select
+                className="bg-[#313244] text-[#cdd6f4] border border-[#45475a] rounded py-1 px-2 text-xs cursor-pointer"
+                value={table.getState().pagination.pageSize}
+                onChange={(e) => table.setPageSize(Number(e.target.value))}
+              >
+                {[5, 10, 20, 50].map((size) => (
+                  <option key={size} value={size}>Show {size}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
+
 export default UsersListPage;
