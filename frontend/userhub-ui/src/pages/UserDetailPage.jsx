@@ -62,7 +62,7 @@ function UserDetailPage() {
   return (
     <div className="max-w-2xl mx-auto py-8 px-6">
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate('/users')}
         className="mb-6 py-2 px-4 rounded-lg border-0 cursor-pointer text-sm font-medium bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] transition-colors"
       >
         ← Back
