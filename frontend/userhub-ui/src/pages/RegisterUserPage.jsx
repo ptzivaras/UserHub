@@ -78,78 +78,82 @@ function RegisterUserPage() {
     `w-full py-2 px-3 rounded-md border ${hasError ? 'border-[#f38ba8]' : 'border-[#45475a]'} bg-[#313244] text-[#cdd6f4] text-base focus:outline-none focus:border-[#89b4fa]`;
 
   return (
-    <div className="max-w-xl mx-auto">
-      <div className="flex items-center gap-3 mb-4">
+    <div className="max-w-4xl mx-auto py-8 px-6">
+      <div className="flex items-center gap-4 mb-10">
         <button
           onClick={() => navigate(-1)}
-          className="py-1.5 px-3 rounded-md border-0 cursor-pointer text-sm font-medium bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] transition-colors"
+          className="py-2 px-4 rounded-lg border-0 cursor-pointer text-sm font-medium bg-[#313244] text-[#cdd6f4] hover:bg-[#45475a] transition-colors"
         >
           ← Back
         </button>
-        <h2 className="text-2xl font-bold text-[#cdd6f4] m-0">Register New User</h2>
+        <h2 className="text-3xl font-bold text-[#cdd6f4] m-0">Register New User</h2>
       </div>
 
       {apiError && (
-        <div className="py-3 px-4 rounded-md mb-4 bg-[#3b1219] text-[#f38ba8] border border-[#f38ba8]">{apiError}</div>
+        <div className="py-3 px-5 rounded-lg mb-6 bg-[#3b1219] text-[#f38ba8] border border-[#f38ba8]">{apiError}</div>
       )}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-5 bg-[#1e1e2e] p-8 rounded-lg" noValidate>
+      <form onSubmit={handleSubmit} className="bg-[#1e1e2e] p-10 rounded-2xl border border-[#313244] shadow-lg" noValidate>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="name" className="text-sm text-[#cdd6f4]">Name *</label>
-          <input id="name" type="text" name="name" value={form.name} onChange={handleChange} className={inputClass(errors.name)} />
-          <span className="text-[#f38ba8] text-xs h-4 block">{errors.name || ''}</span>
+        <div className="grid grid-cols-2 gap-8 mb-8">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="name" className="text-sm font-medium text-[#cdd6f4]">Name *</label>
+            <input id="name" type="text" name="name" value={form.name} onChange={handleChange} className={inputClass(errors.name)} />
+            <span className="text-[#f38ba8] text-xs h-4 block">{errors.name || ''}</span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="surname" className="text-sm font-medium text-[#cdd6f4]">Surname *</label>
+            <input id="surname" type="text" name="surname" value={form.surname} onChange={handleChange} className={inputClass(errors.surname)} />
+            <span className="text-[#f38ba8] text-xs h-4 block">{errors.surname || ''}</span>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="surname" className="text-sm text-[#cdd6f4]">Surname *</label>
-          <input id="surname" type="text" name="surname" value={form.surname} onChange={handleChange} className={inputClass(errors.surname)} />
-          <span className="text-[#f38ba8] text-xs h-4 block">{errors.surname || ''}</span>
+        <div className="grid grid-cols-2 gap-8 mb-8">
+          <div className="flex flex-col gap-2">
+            <label htmlFor="gender" className="text-sm font-medium text-[#cdd6f4]">Gender *</label>
+            <select id="gender" name="gender" value={form.gender} onChange={handleChange} className={inputClass(errors.gender)}>
+              <option value="">-- Select --</option>
+              <option value="M">Male</option>
+              <option value="F">Female</option>
+            </select>
+            <span className="text-[#f38ba8] text-xs h-4 block">{errors.gender || ''}</span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="birthdate" className="text-sm font-medium text-[#cdd6f4]">Birthdate *</label>
+            <DatePicker
+              id="birthdate"
+              selected={form.birthdate}
+              onChange={handleDateChange}
+              dateFormat="dd/MM/yyyy"
+              placeholderText="DD/MM/YYYY"
+              showYearDropdown
+              showMonthDropdown
+              dropdownMode="select"
+              maxDate={new Date()}
+              wrapperClassName="w-full"
+              className={inputClass(errors.birthdate)}
+            />
+            <span className="text-[#f38ba8] text-xs h-4 block">{errors.birthdate || ''}</span>
+          </div>
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="gender" className="text-sm text-[#cdd6f4]">Gender *</label>
-          <select id="gender" name="gender" value={form.gender} onChange={handleChange} className={inputClass(errors.gender)}>
-            <option value="">-- Select --</option>
-            <option value="M">Male</option>
-            <option value="F">Female</option>
-          </select>
-          <span className="text-[#f38ba8] text-xs h-4 block">{errors.gender || ''}</span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="birthdate" className="text-sm text-[#cdd6f4]">Birthdate *</label>
-          <DatePicker
-            id="birthdate"
-            selected={form.birthdate}
-            onChange={handleDateChange}
-            dateFormat="dd/MM/yyyy"
-            placeholderText="DD/MM/YYYY"
-            showYearDropdown
-            showMonthDropdown
-            dropdownMode="select"
-            maxDate={new Date()}
-            wrapperClassName="w-full"
-            className={inputClass(errors.birthdate)}
-          />
-          <span className="text-[#f38ba8] text-xs h-4 block">{errors.birthdate || ''}</span>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="workAddress" className="text-sm text-[#cdd6f4]">Work Address</label>
+        <div className="mb-8">
+          <label htmlFor="workAddress" className="text-sm font-medium text-[#cdd6f4] block mb-2">Work Address</label>
           <textarea id="workAddress" name="workAddress" value={form.workAddress} onChange={handleChange} rows={3} className={inputClass(false)} />
         </div>
 
-        <div className="flex flex-col gap-1">
-          <label htmlFor="homeAddress" className="text-sm text-[#cdd6f4]">Home Address</label>
+        <div className="mb-8">
+          <label htmlFor="homeAddress" className="text-sm font-medium text-[#cdd6f4] block mb-2">Home Address</label>
           <textarea id="homeAddress" name="homeAddress" value={form.homeAddress} onChange={handleChange} rows={3} className={inputClass(false)} />
         </div>
 
-        <div className="flex gap-4 justify-end mt-2">
-          <button type="button" className="py-2 px-5 rounded-md border-0 cursor-pointer text-base font-medium bg-[#45475a] text-[#cdd6f4] hover:bg-[#585b70]" onClick={() => navigate(-1)}>
+        <div className="flex gap-4 justify-end pt-6 border-t border-[#313244]">
+          <button type="button" className="py-2.5 px-6 rounded-lg border-0 cursor-pointer text-base font-medium bg-[#45475a] text-[#cdd6f4] hover:bg-[#585b70] transition-colors" onClick={() => navigate(-1)}>
             Cancel
           </button>
-          <button type="submit" className="py-2 px-5 rounded-md border-0 cursor-pointer text-base font-medium bg-[#89b4fa] text-[#1e1e2e] hover:bg-[#b4d0fb] disabled:opacity-60 disabled:cursor-not-allowed" disabled={submitting}>
+          <button type="submit" className="py-2.5 px-6 rounded-lg border-0 cursor-pointer text-base font-medium bg-[#89b4fa] text-[#1e1e2e] hover:bg-[#b4d0fb] transition-colors disabled:opacity-60 disabled:cursor-not-allowed" disabled={submitting}>
             {submitting ? 'Registering...' : 'Register User'}
           </button>
         </div>
