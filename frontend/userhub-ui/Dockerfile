@@ -17,8 +17,8 @@ WORKDIR /app
 COPY --from=builder /app/dist dist
 COPY package*.json .
 
-RUN npm install --production
+RUN npm install
 
 EXPOSE 5173
 
-CMD ["npm", "run", "preview"]
+CMD ["npm", "run", "preview", "--", "--port", "5173", "--host"]
