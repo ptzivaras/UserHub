@@ -16,7 +16,7 @@ function UsersListPage() {
   const [loading, setLoading] = useState(true);
   const [pendingDeleteId, setPendingDeleteId] = useState(null);
   const [sorting, setSorting] = useState([]);
-  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 5 });
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: parseInt(localStorage.getItem('pageSize')) || 5 });
   const [globalFilter, setGlobalFilter] = useState('');
   const navigate = useNavigate();
 
@@ -190,7 +190,11 @@ function UsersListPage() {
               <select
                 className="bg-[#313244] text-[#cdd6f4] border border-[#45475a] rounded-lg py-1.5 px-3 text-sm cursor-pointer hover:border-[#89b4fa] transition-colors"
                 value={table.getState().pagination.pageSize}
-                onChange={(e) => table.setPageSize(Number(e.target.value))}
+                onChange={(e) => {
+                  const size = Number(e.target.value);
+                  localStorage.setItem('pageSize', size);
+                  table.setPageSize(size);
+                }}
               >
                 {[5, 10, 20, 50].map((size) => (
                   <option key={size} value={size}>Show {size}</option>
