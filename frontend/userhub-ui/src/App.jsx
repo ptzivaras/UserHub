@@ -32,13 +32,15 @@ function Navbar() {
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/users" element={<UsersListPage />} />
-        <Route path="/users/:id" element={<UserDetailPage />} />
-        <Route path="/register" element={<RegisterUserPage />} />
-      </Routes>
+      <div className="min-h-screen bg-[#181825]">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/users" element={<UsersListPage />} />
+          <Route path="/users/:id" element={<UserDetailPage />} />
+          <Route path="/register" element={<RegisterUserPage />} />
+        </Routes>
+      </div>
     </BrowserRouter>
   )
 }
