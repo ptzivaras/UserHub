@@ -59,6 +59,30 @@ erDiagram
 | `DELETE` | `/api/users/{id}` | Delete a user |
 
 ---
+## Known Limitations & Trade-offs
+
+- **No Authentication or Authorization** — There is no login, JWT, or role-based access control. In a real application, JWT tokens would be used and stored securely on the client side (e.g. via Redux Toolkit) to protect API endpoints and restrict access based on user roles.
+
+- **No API Versioning** — All endpoints are unversioned (e.g. `/api/users` instead of `/api/v1/users`). Versioning would be essential in production to allow backward-compatible API evolution.
+
+- **No Rate Limiting** — No throttling or rate limiting is applied to any endpoint. A production service would use rate limiting to prevent abuse and protect server resources.
+
+- **No Caching** — No caching layer (e.g. Spring Cache, Redis) is implemented. Given the small dataset and project scope, caching was not necessary here.
+
+- **No Update User Feature** — Only create, read, and delete operations are supported. Adding an update feature would also require a concurrency strategy (e.g. optimistic locking with `@Version`) to handle simultaneous edits.
+
+- **Hibernate Auto-DDL for Schema Management** — The database schema is generated automatically by Hibernate (`ddl-auto`). This is acceptable for a development project but would be replaced by a migration tool like Flyway or Liquibase in production.
+
+- **`show-sql: true` Enabled** — SQL logging is turned on for development convenience. In a production environment, this should be disabled or routed to a proper logging framework to avoid excessive log output.
+
+- **No Server-Side Pagination** — All users are fetched in a single query. This works for a small dataset, but for a large-scale application, server-side pagination would be necessary to avoid loading too much data into memory. Client-side pagination is handled using TanStack React Table.
+
+- **No Logging Framework Configuration** — The project relies on Spring Boot's default logging. A production application would configure a logging framework (e.g. Logback with structured output) with appropriate log levels and log file management.
+
+- **Hard Delete Only** — Deleting a user permanently removes the record from the database. Soft delete (using flags like `deleted_at` or `updated_at`) was intentionally not implemented to keep the schema simple. Only a `created_at` timestamp is tracked.
+
+- **Limited Test Coverage** — The project does not include integration tests or extensive unit tests. In a production codebase, thorough test coverage would be expected.
+
 
 ## Running with Docker
 
