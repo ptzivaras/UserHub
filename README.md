@@ -81,7 +81,7 @@ erDiagram
 
 - **Hard Delete Only** — Deleting a user permanently removes the record from the database. Soft delete (using flags like `deleted_at` or `updated_at`) was intentionally not implemented to keep the schema simple. Only a `created_at` timestamp is tracked.
 
-- **Limited Test Coverage** — The project does not include integration tests or extensive unit tests. In a production codebase, thorough test coverage would be expected.
+- **Limited Test Coverage** — The project does not include integration tests or extensive unit tests. In a production codebase, thorough test coverage would be expected. For integration test i should add a mock database like m2 and repository design pattern helps in that case.
 
 
 ## Running with Docker
