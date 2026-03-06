@@ -83,6 +83,12 @@ erDiagram
 
 - **Limited Test Coverage** — The project does not include integration tests or extensive unit tests. In a production codebase, thorough test coverage would be expected. For integration test i should add a mock database like m2 and repository design pattern helps in that case.
 
+- **No HTTPS** — The application currently runs over plain HTTP. This means that data sent between the client and the server is not encrypted. In a real production environment this would not be acceptable because information such as user names or addresses could potentially be intercepted on insecure networks (for example public Wi-Fi).
+
+- **No CSRF Protection** — Since there is no Spring Security, there is no CSRF protection in place. Not a concern right now without session-based auth.
+
+- **No Security Headers** — Headers like `Content-Security-Policy`, `X-Frame-Options`, and `X-Content-Type-Options` are not set. A reverse proxy or Spring Security would handle these in a real deployment. These headers help browsers protect the application from security issues.
+
 
 ## Running with Docker
 
