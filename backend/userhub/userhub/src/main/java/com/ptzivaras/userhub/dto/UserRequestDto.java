@@ -5,15 +5,18 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public class UserRequestDto {
     @NotBlank(message = "Name is mandatory")
+    @Size(max = 100, message = "Name must not exceed 100 characters")
     private String name;
 
     @NotBlank(message = "Surname is mandatory")
+    @Size(max = 100, message = "Surname must not exceed 100 characters")
     private String surname;
 
     @NotNull(message = "Gender is mandatory")
