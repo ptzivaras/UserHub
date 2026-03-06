@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:8080/api/users';
+const BASE_URL = `${import.meta.env.VITE_API_URL}/users`;
 
 export const getAllUsers = (config = {}) => axios.get(BASE_URL, config);
 
